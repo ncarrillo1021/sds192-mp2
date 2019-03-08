@@ -19,5 +19,3 @@ load("candidates.rda")
 load("committees.rda")
 load("contributions.rda")
 ```
-
-> Word count: `r wordcountaddin::word_count()`
