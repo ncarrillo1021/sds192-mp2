@@ -12,7 +12,7 @@ output:
 
 urgeuiyg
 
-```{r, message=FALSE}
+```{r, message=TRUE}
 library(tidyverse)
 load("house_elections.rda")
 load("candidates.rda")
