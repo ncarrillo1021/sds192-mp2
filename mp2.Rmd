@@ -10,7 +10,7 @@ output:
 
 ## Loading the data
 
-uhhh what do u guys think we should do for this project?
+uhhh what do 
 
 ```{r, message=FALSE}
 library(tidyverse)
