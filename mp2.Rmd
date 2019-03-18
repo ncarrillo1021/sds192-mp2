@@ -10,7 +10,7 @@ output:
 
 ## Loading the data
 
-This project is so interesting and relevant to my life!
+This project is so interesting and relevant to my life! Group project
 
 ```{r, message=TRUE}
 library(tidyverse)
