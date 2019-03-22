@@ -1,23 +1,47 @@
 ---
 title: "Mini-Project 2"
-author: "Carmen Canedo, Dianne Caravela, Neyda Carrillo"
+author: "Dianne Caravela, Neyda Carrillo, Carmen Canedo"
 date: "2019-03-24"
 output: 
   html_document:
     code_folding: show
 ---
 
-
-## Loading the data
-
-This project is so interesting and relevant to my life! Group project
-
-```{r, message=TRUE}
+```{r, message=FALSE}
 library(tidyverse)
+install.packages("devtools")
 load("house_elections.rda")
 load("candidates.rda")
 load("committees.rda")
 load("contributions.rda")
 ```
+> Word count: 'r wordcountaddin::word_count()'
 
-> Word count: `r wordcountaddin::word_count()`
+###Committee Party Affiliation 
+
+```{r, message=FALSE}
+party_cmte <- committees %>%
+  filter(cmte_state == "AZ") %>%
+  filter(cmte_party_affiliation %in% c("DEM", "REP")) %>%
+  group_by(cmte_party_affiliation) %>%
+  select(cmte_id) 
+party_cmte
+```
+
+###Committee Contribution  
+
+```{r, message=FALSE}
+trans_amt <- contributions %>%
+  select(cmte_id, transaction_amt)
+trans_amt
+```
+
+###Committe Expenditure
+
+```{r, message=FALSE}
+cmte_expenditure <-inner_join(party_cmte, trans_amt)
+cmte_expenditure
+```
+
+
+
