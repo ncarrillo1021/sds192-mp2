@@ -20,29 +20,59 @@ load("contributions.rda")
 
 ###Committee Party Affiliation 
 
+Creates list of republican committees in a state
 ```{r, message=FALSE}
-party_cmte <- committees %>%
+party_cmte_REP <- committees %>%
   filter(cmte_state == "AZ") %>%
-  filter(cmte_party_affiliation %in% c("REP", "DEM")) %>%
+  filter(cmte_party_affiliation == "REP") %>%
   group_by(cmte_party_affiliation) %>%
-  select(cmte_id) %>%
-  summarize %>% 
-party_cmte
+  select(cmte_id) 
+party_cmte_REP
 ```
+
+Creates list of Democratic committees in a state
+```{r}
+party_cmte_DEM <- committees %>%
+  filter(cmte_state == "AZ") %>%
+  filter(cmte_party_affiliation == "DEM") %>%
+  group_by(cmte_party_affiliation) %>%
+  select(cmte_id) 
+party_cmte_DEM
+```
+
 
 ###Committee Contribution  
 
+Creates table with just committee ID and transaction info for every transaction
 ```{r, message=FALSE}
 trans_amt <- contributions %>%
   select(cmte_id, transaction_amt)
 trans_amt
 ```
 
-###Committe Expenditure
+Committe Expenditure
 
+Joins Rebublican committee list with transactions, summarizes the number of committies and the total amount of money they recieved
 ```{r, message=FALSE}
-cmte_expenditure <-inner_join(party_cmte, trans_amt)
-cmte_expenditure
+cmte_expenditure_REP <- inner_join(party_cmte_REP, trans_amt)  %>%
+  summarize(num_committees = n(), total_cont = sum(transaction_amt))
+cmte_expenditure_REP
+```
+
+Does the same with Democratic committees
+```{r, message=FALSE}
+cmte_expenditure_DEM <- inner_join(party_cmte_DEM, trans_amt)  %>%
+  summarize(num_committees = n(), total_cont = sum(transaction_amt))
+cmte_expenditure_DEM
+```
+
+Joins Republican and Democratic summary tables
+```{r}
+final_table <- full_join(cmte_expenditure_DEM, cmte_expenditure_REP)
+final_table
 ```
 
 > Word count: 'r wordcountaddin::word_count()'
+
+
+
