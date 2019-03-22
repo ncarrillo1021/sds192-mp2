@@ -18,72 +18,64 @@ load("committees.rda")
 load("contributions.rda")
 ```
 
-###Committee Party Affiliation 
 
-Creates list of republican committees in a state
+Generalizes the data wrangling so it works for any state
 ```{r, message=FALSE}
-party_cmte_REP <- committees %>%
-  filter(cmte_state == "AZ") %>%
-  filter(cmte_party_affiliation == "REP") %>%
-  group_by(cmte_party_affiliation) %>%
-  select(cmte_id) 
-```
+wrangle_state <- function(state_arg) {
+  
+#Creates list of democratic committees in given state
+  party_cmte_DEM <- committees %>%
+    filter(cmte_state == state_arg) %>%
+    filter(cmte_party_affiliation == "DEM") %>%
+    group_by(cmte_party_affiliation) %>%
+    select(cmte_id)
+  
+#Creates list of republican committees in given state
+  party_cmte_REP <- committees %>%
+    filter(cmte_state == state_arg) %>%
+    filter(cmte_party_affiliation == "REP") %>%
+    group_by(cmte_party_affiliation) %>%
+    select(cmte_id) 
 
-Creates list of Democratic committees in a state
-```{r, message=FALSE}
-party_cmte_DEM <- committees %>%
-  filter(cmte_state == "AZ") %>%
-  filter(cmte_party_affiliation == "DEM") %>%
-  group_by(cmte_party_affiliation) %>%
-  select(cmte_id)
-```
+#Creates table with just committee ID and transaction info for every transaction 
+  trans_amt <- contributions %>%
+    select(cmte_id, transaction_amt)
 
-###Committee Contribution  
+#Joins Rebublican committee list with transactions, summarizes the number of committies and the total amount of money they recieved  
+  cmte_expenditure_DEM <- inner_join(party_cmte_DEM, trans_amt)  %>%
+    summarize(num_committees = n(), total_cont = sum(transaction_amt))
+  
+#Does the same with Democratic committee list  
+  cmte_expenditure_REP <- inner_join(party_cmte_REP, trans_amt)  %>%
+    summarize(num_committees = n(), total_cont = sum(transaction_amt))
 
-Creates table with just committee ID and transaction info for every transaction
-```{r, message=FALSE}
-trans_amt <- contributions %>%
-  select(cmte_id, transaction_amt)
-```
-
-###Committe Expenditure
-
-Joins Rebublican committee list with transactions, summarizes the number of committies and the total amount of money they recieved
-```{r, message=FALSE}
-cmte_expenditure_REP <- inner_join(party_cmte_REP, trans_amt)  %>%
-  summarize(num_committees = n(), total_cont = sum(transaction_amt))
-```
-
-Does the same with Democratic committees
-```{r, message=FALSE}
-cmte_expenditure_DEM <- inner_join(party_cmte_DEM, trans_amt)  %>%
-  summarize(num_committees = n(), total_cont = sum(transaction_amt))
-```
-
-Joins Republican and Democratic summary tables
-```{r, message=FALSE}
-final_table <- full_join(cmte_expenditure_DEM, cmte_expenditure_REP)
+#Joins Republican and Democratic summary tables 
+  final_table <- full_join(cmte_expenditure_DEM, cmte_expenditure_REP) %>%
+    mutate(total_cont_thousands = total_cont / 1000)
+  
 final_table
-```
-
-
-Creates graphs of number of committees by party and of total contributions by party
-```{r}
-total_cont_graph <- ggplot(final_table, aes(x = cmte_party_affiliation, y = total_cont, fill = cmte_party_affiliation)) +
-  geom_bar( stat = "identity", width = 0.5) +
-  scale_fill_manual(breaks = c("DEM", "REP"),
+ 
+#Creates graph of total contributions by party 
+  total_cont_graph <- ggplot(final_table, aes(x = cmte_party_affiliation, y = total_cont_thousands, fill = cmte_party_affiliation)) +
+    geom_bar( stat = "identity", width = 0.5) +
+    scale_fill_manual(breaks = c("DEM", "REP"),
                     values = c("blue", "red")) +
-  guides(fill = FALSE)
+    guides(fill = FALSE) +
+    xlab("Party Affiliation") + ylab("Total contributions (in thousands of dollars)") + ggtitle("Amount of contributions to committees by party in ", state_arg)
 
-
-num_commit_graph <- ggplot(final_table, aes(x = cmte_party_affiliation, y = num_committees, fill = cmte_party_affiliation)) +
-  geom_bar( stat = "identity", width = 0.5) +
-  scale_fill_manual(breaks = c("DEM", "REP"),
+#Creates graph of number of committees by party
+  num_commit_graph <- ggplot(final_table, aes(x = cmte_party_affiliation, y = num_committees, fill = cmte_party_affiliation)) +
+    geom_bar( stat = "identity", width = 0.5) +
+    scale_fill_manual(breaks = c("DEM", "REP"),
                     values = c("blue", "red")) +
-  guides(fill = FALSE)
+    guides(fill = FALSE) +
+    xlab("Party Affiliation") + ylab("Number of Committees") + ggtitle("Number of committees by party afffiliation in ", state_arg)
+ 
+#prints the two graphs side by side 
+  grid.arrange(num_commit_graph, total_cont_graph, nrow = 1)
+}
 
-
-grid.arrange(num_commit_graph, total_cont_graph, nrow = 1)
+wrangle_state(state_arg = "CA")
 ```
 
 ratio_table <- final_table %>%
