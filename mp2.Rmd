@@ -7,11 +7,10 @@ output:
     code_folding: hide
 ---
 
-## Loading the data
-
 ```{r, include = FALSE}
 library(tidyverse)
 library(devtools)
+library(usmap)
 library(gridExtra)
 load("house_elections.rda")
 load("candidates.rda")
@@ -28,7 +27,6 @@ party_cmte_REP <- committees %>%
   filter(cmte_party_affiliation == "REP") %>%
   group_by(cmte_party_affiliation) %>%
   select(cmte_id) 
-party_cmte_REP
 ```
 
 Creates list of Democratic committees in a state
@@ -37,8 +35,7 @@ party_cmte_DEM <- committees %>%
   filter(cmte_state == "AZ") %>%
   filter(cmte_party_affiliation == "DEM") %>%
   group_by(cmte_party_affiliation) %>%
-  select(cmte_id) 
-party_cmte_DEM
+  select(cmte_id)
 ```
 
 ###Committee Contribution  
@@ -47,7 +44,6 @@ Creates table with just committee ID and transaction info for every transaction
 ```{r, message=FALSE}
 trans_amt <- contributions %>%
   select(cmte_id, transaction_amt)
-trans_amt
 ```
 
 ###Committe Expenditure
@@ -56,14 +52,12 @@ Joins Rebublican committee list with transactions, summarizes the number of comm
 ```{r, message=FALSE}
 cmte_expenditure_REP <- inner_join(party_cmte_REP, trans_amt)  %>%
   summarize(num_committees = n(), total_cont = sum(transaction_amt))
-cmte_expenditure_REP
 ```
 
 Does the same with Democratic committees
 ```{r, message=FALSE}
 cmte_expenditure_DEM <- inner_join(party_cmte_DEM, trans_amt)  %>%
   summarize(num_committees = n(), total_cont = sum(transaction_amt))
-cmte_expenditure_DEM
 ```
 
 Joins Republican and Democratic summary tables
@@ -72,21 +66,31 @@ final_table <- full_join(cmte_expenditure_DEM, cmte_expenditure_REP)
 final_table
 ```
 
-Graphing the amount spent by Democratic affiliated parties and Republican affiliated parties
+
+Creates graphs of number of committees by party and of total contributions by party
 ```{r}
-ggplot(final_table, aes(x = cmte_party_affiliation, y = total_cont, fill = cmte_party_affiliation)) +
-  geom_bar(stat =  "identity", width = 0.5) +
+total_cont_graph <- ggplot(final_table, aes(x = cmte_party_affiliation, y = total_cont, fill = cmte_party_affiliation)) +
+  geom_bar( stat = "identity", width = 0.5) +
   scale_fill_manual(breaks = c("DEM", "REP"),
-                    values = c("blue", "red"))
+                    values = c("blue", "red")) +
+  guides(fill = FALSE)
+
+
+num_commit_graph <- ggplot(final_table, aes(x = cmte_party_affiliation, y = num_committees, fill = cmte_party_affiliation)) +
+  geom_bar( stat = "identity", width = 0.5) +
+  scale_fill_manual(breaks = c("DEM", "REP"),
+                    values = c("blue", "red")) +
+  guides(fill = FALSE)
+
+
+grid.arrange(num_commit_graph, total_cont_graph, nrow = 1)
 ```
 
-```{r}
-ggplot(final_table, aes(x = cmte_party_affiliation, y = num_committees, fill = cmte_party_affiliation)) +
-  geom_bar(stat = "identity", width = 0.5) +
-  scale_fill_manual(breaks = c("DEM", "REP"),
-                    values = c("blue", "red"))
-``` 
-
+ratio_table <- final_table %>%
+  spread(key = cmte_party_affiliation, value = num_committees) %>%
+  mutate(percent_rep_commit = )
+ratio_table
+mutate()
 
 > Word count: 'r wordcountaddin::word_count()'
 
