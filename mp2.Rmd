@@ -1,44 +1,49 @@
 ---
 title: "Mini-Project 2"
-author: "Dianne Caravela, Neyda Carrillo, Carmen Canedo"
+author: "Dianne Caravela, Neyda Carrillo"
 date: "2019-03-24"
 output: 
   html_document:
-    code_folding: show
+    code_folding: hide
 ---
 
-```{r, message=FALSE}
+## Loading the data
+
+```{r, include = FALSE}
 library(tidyverse)
 library(devtools)
+library(gridExtra)
 load("house_elections.rda")
 load("candidates.rda")
 load("committees.rda")
 load("contributions.rda")
 ```
-> Word count: 'r wordcountaddin::word_count()'
 
 ###Committee Party Affiliation 
 
+Creates list of republican committees in a state
 ```{r, message=FALSE}
-party_cmteREP <- committees %>%
+party_cmte_REP <- committees %>%
   filter(cmte_state == "AZ") %>%
   filter(cmte_party_affiliation == "REP") %>%
   group_by(cmte_party_affiliation) %>%
   select(cmte_id) 
-party_cmteREP
+party_cmte_REP
 ```
 
+Creates list of Democratic committees in a state
 ```{r, message=FALSE}
-party_cmteDEM <- committees %>%
+party_cmte_DEM <- committees %>%
   filter(cmte_state == "AZ") %>%
   filter(cmte_party_affiliation == "DEM") %>%
   group_by(cmte_party_affiliation) %>%
   select(cmte_id) 
-party_cmteDEM
+party_cmte_DEM
 ```
 
 ###Committee Contribution  
 
+Creates table with just committee ID and transaction info for every transaction
 ```{r, message=FALSE}
 trans_amt <- contributions %>%
   select(cmte_id, transaction_amt)
@@ -47,15 +52,43 @@ trans_amt
 
 ###Committe Expenditure
 
+Joins Rebublican committee list with transactions, summarizes the number of committies and the total amount of money they recieved
 ```{r, message=FALSE}
-REPcmte_expenditure <- inner_join(party_cmteREP, trans_amt)
-REPcmte_expenditure
+cmte_expenditure_REP <- inner_join(party_cmte_REP, trans_amt)  %>%
+  summarize(num_committees = n(), total_cont = sum(transaction_amt))
+cmte_expenditure_REP
 ```
 
+Does the same with Democratic committees
 ```{r, message=FALSE}
-DEMcmte_expenditure <- inner_join(party_cmteDEM, trans_amt)
-DEMcmte_expenditure
+cmte_expenditure_DEM <- inner_join(party_cmte_DEM, trans_amt)  %>%
+  summarize(num_committees = n(), total_cont = sum(transaction_amt))
+cmte_expenditure_DEM
 ```
+
+Joins Republican and Democratic summary tables
+```{r, message=FALSE}
+final_table <- full_join(cmte_expenditure_DEM, cmte_expenditure_REP)
+final_table
+```
+
+Graphing the amount spent by Democratic affiliated parties and Republican affiliated parties
+```{r}
+ggplot(final_table, aes(x = cmte_party_affiliation, y = total_cont, fill = cmte_party_affiliation)) +
+  geom_bar(stat =  "identity", width = 0.5) +
+  scale_fill_manual(breaks = c("DEM", "REP"),
+                    values = c("blue", "red"))
+```
+
+```{r}
+ggplot(final_table, aes(x = cmte_party_affiliation, y = num_committees, fill = cmte_party_affiliation)) +
+  geom_bar(stat = "identity", width = 0.5) +
+  scale_fill_manual(breaks = c("DEM", "REP"),
+                    values = c("blue", "red"))
+``` 
+
+
+> Word count: 'r wordcountaddin::word_count()'
 
 
 
