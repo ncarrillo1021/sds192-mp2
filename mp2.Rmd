@@ -1,16 +1,14 @@
 ---
 title: "Mini-Project 2"
-author: "Dianne Caravela, Neyda Carrillo, Carmen Canedo"
+author: "Dianne Caravela, Neyda Carrillo"
 date: "2019-03-24"
 output: 
   html_document:
-    code_folding: show
+    code_folding: hide
 ---
 
 
 ## Loading the data
-
-urgeuiyg
 
 ```{r, message=TRUE}
 library(tidyverse)
@@ -18,5 +16,24 @@ load("house_elections.rda")
 load("candidates.rda")
 load("committees.rda")
 load("contributions.rda")
+```
+
+```{r, echo=TRUE}
+filteredCont <- contributions %>%
+  filter(state == "AZ") %>%
+  mutate()
+glimpse(filteredCont)
+```
+
+```{r, echo=TRUE}
+filteredCom <- committees %>%
+  filter(state == "AZ") %>%
+  mutate()
+glimpse(filteredCont)
+```
+
+### Join tables by comittee ID
+```{r}
+
 ```
 > Word count: 'r wordcountaddin::word_count()'
