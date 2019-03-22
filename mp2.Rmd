@@ -7,33 +7,42 @@ output:
     code_folding: hide
 ---
 
-
 ## Loading the data
 
-```{r, message=TRUE}
+```{r, include = FALSE}
 library(tidyverse)
+library(devtools)
 load("house_elections.rda")
 load("candidates.rda")
 load("committees.rda")
 load("contributions.rda")
 ```
 
-```{r, echo=TRUE}
-filteredCont <- contributions %>%
-  filter(state == "AZ") %>%
-  mutate()
-glimpse(filteredCont)
+###Committee Party Affiliation 
+
+```{r, message=FALSE}
+party_cmte <- committees %>%
+  filter(cmte_state == "AZ") %>%
+  filter(cmte_party_affiliation %in% c("REP", "DEM")) %>%
+  group_by(cmte_party_affiliation) %>%
+  select(cmte_id) %>%
+  summarize %>% 
+party_cmte
 ```
 
-```{r, echo=TRUE}
-filteredCom <- committees %>%
-  filter(state == "AZ") %>%
-  mutate()
-glimpse(filteredCont)
+###Committee Contribution  
+
+```{r, message=FALSE}
+trans_amt <- contributions %>%
+  select(cmte_id, transaction_amt)
+trans_amt
 ```
 
-### Join tables by comittee ID
-```{r}
+###Committe Expenditure
 
+```{r, message=FALSE}
+cmte_expenditure <-inner_join(party_cmte, trans_amt)
+cmte_expenditure
 ```
+
 > Word count: 'r wordcountaddin::word_count()'
