@@ -37,7 +37,6 @@ party_cmteDEM <- committees %>%
 party_cmteDEM
 ```
 
-
 ###Committee Contribution  
 
 ```{r, message=FALSE}
@@ -58,7 +57,5 @@ DEMcmte_expenditure <- inner_join(party_cmteDEM, trans_amt)
 DEMcmte_expenditure
 ```
 
-```{r}
 
-```
 
