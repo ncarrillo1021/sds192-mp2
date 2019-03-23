@@ -61,7 +61,7 @@ print(final_table)
     scale_fill_manual(breaks = c("DEM", "REP"),
                     values = c("blue", "red")) +
     guides(fill = FALSE) +
-    xlab("Party Affiliation") + ylab("Total contributions (in thousands of dollars)") + ggtitle("Amount of contributions by committees by party in ", state_arg)
+    xlab("Party Affiliation") + ylab("Total contributions (in thousands of dollars)") + ggtitle("Amount of contributions \nby committees by party in ", state_arg)
 
 #Creates graph of number of committees by party
   num_commit_graph <- ggplot(final_table, aes(x = cmte_party_affiliation, y = num_committees, fill = cmte_party_affiliation)) +
@@ -69,13 +69,13 @@ print(final_table)
     scale_fill_manual(breaks = c("DEM", "REP"),
                     values = c("blue", "red")) +
     guides(fill = FALSE) +
-    xlab("Party Affiliation") + ylab("Number of Committees") + ggtitle("Number of committees by party afffiliation in ", state_arg)
+    xlab("Party Affiliation") + ylab("Number of Committees") + ggtitle("Number of committees \nby party afffiliation in ", state_arg)
  
 #prints the two graphs side by side 
   grid.arrange(num_commit_graph, total_cont_graph, nrow = 1)
 }
 
-states <- c("AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY")
+states <- c("HI")
 sapply(states, wrangle_state)
 ```
 wrangle_state(state_arg = "CA")
@@ -88,5 +88,5 @@ mutate()
 
 > Word count: 'r wordcountaddin::word_count()'
 
-
-
+ List of all 50 states:
+states <- c("AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY")
